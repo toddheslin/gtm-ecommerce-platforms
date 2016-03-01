@@ -1,8 +1,10 @@
 What's this about?
 ==================
-TBC
+My central repository for the analytics tools I use, references I rely on and code snippits that save me hours of time. Feel free to use and contribute.
 
+I will help with any issues that are submitted. Problems that are specific to your site or campaign verge on being client work. If it's custom for you, you can choose to me. If it's generic for everyone, I'll help in my space time.
 
+Enjoy!
 
 Terminology
 -----------
@@ -34,9 +36,9 @@ This is the same tech stack I use for my consulting clients. Everything here is 
 
 Specific guides
 ---------------
-<a href="/blob/master/shopify/shopify.md">Shopify Guide</a>
-<a href="/blob/master/squarespace/squarespace.md">Squarespace Guide</a>
+[Shopify Guide](https://github.com/toddheslin/gtm-ecommerce-platforms/blob/master/shopify/shopify.md)
+[Squarespace Guide — TBC]()
 
 Need help?
 ----------
-Feel free to email me at wow@beingremarkable.me (points to my personal email)
+Feel free to email me at wow@beingremarkable.me (redirects to my personal email)
