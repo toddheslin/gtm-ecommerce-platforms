@@ -31,12 +31,13 @@ Google Tag Manager is a powerful tool for managing javascript functions that are
 
 Technology used
 ---------------
-This is the same tech stack I use for my consulting clients. Everything here is the 'source code' of how I run my Analytics as a Service (not bothering with an acronym here) practice
+This is the same tech stack I use for my consulting clients. Everything here is the 'source code' of how I run my Analytics as a Service (no acronym needed) practice
 
 
 Specific guides
 ---------------
 [Shopify Guide](https://github.com/toddheslin/gtm-ecommerce-platforms/blob/master/shopify/shopify.md)
+
 [Squarespace Guide — TBC]()
 
 Need help?
