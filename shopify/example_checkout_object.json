@@ -31,11 +31,11 @@
       {
          "id":"faa925256da45758",
          "product_id":3982386689,
-         "variant_id":11585078401,
+         "variant_id":11585078401, // GA Ecommerce - Product SKU
          "sku":null,
          "vendor":"Acme",
-         "title":"Example T-Shirt",
-         "variant_title":"Lithograph - Height: 9\" x Width: 12\"",
+         "title":"Example T-Shirt", // Part one of GA Ecommerce Product
+         "variant_title":"Lithograph - Height: 9\" x Width: 12\"", // Part two of GA Ecommerce Product
          "taxable":true,
          "requires_shipping":true,
          "price":"25.00",
