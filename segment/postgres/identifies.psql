@@ -1,0 +1,90 @@
+/*
+** Converting the Identifies Table into a Users Table
+*/
+with identifies as (
+  select user_id,
+         email,
+         plan,
+         sent_at,
+         row_number() over (partition by user_id order by sent_at desc) as rn
+  from <namespace>.identifies
+),
+users as (
+  select user_id,
+         email,
+         plan
+  from identifies
+  where rn = 1
+)
+
+select *
+from users
+
+/*
+** Count of user traits
+*/
+with identifies as (
+  select user_id,
+         email,
+         plan,
+         sent_at,
+         row_number() over (partition by user_id order by sent_at desc) as rn
+  from initech.identifies
+),
+users as (
+  select plan
+  from identifies
+  where rn = 1
+)
+
+select sum(case when plan = 'Premium' then 1 else 0 end) as premium,
+       sum(case when plan = 'Free' then 1 else 0 end) as free
+from users
+
+/*
+** Counting anonymous id and ip address
+*/
+SELECT
+	anonymous_id,
+	context_ip,
+	COUNT(anonymous_id) AS identify_count,
+	COUNT(context_ip) AS ip_count
+FROM <project>.identifies
+GROUP BY anonymous_id, context_ip
+ORDER BY COUNT(1) DESC;
+
+-- do we have multiple users identified on the same IP?
+SELECT
+	context_ip,
+	COUNT(DISTINCT(anonymous_id)) AS ids
+FROM <project>.identifies
+GROUP BY anonymous_id, context_ip
+ORDER BY ids DESC;
+
+-- do we have users identified across multiple IPs?
+SELECT
+	anonymous_id,
+	COUNT(DISTINCT(context_ip)) AS ips
+FROM hoodiedemo.identifies
+GROUP BY anonymous_id, context_ip
+ORDER BY ips DESC;
+
+-- template to discover user activity over time
+SELECT *
+FROM <project>.identifies
+WHERE anonymous_id = ''
+ORDER BY sent_at;
+
+SELECT anonymous_id,event_id,sent_at
+	FROM <project>.identifies
+UNION
+SELECT anonymous_id,event_id,sent_at
+	FROM <project>.tracks
+WHERE anonymous_id = ''
+ORDER BY sent_at;
+
+-- understand how many unique users interact with the appllication per day
+SELECT DATE(sent_at) AS Day, COUNT(DISTINCT(anonymous_id)) AS Users
+FROM <project>.identifies
+GROUP BY day
+ORDER BY day;

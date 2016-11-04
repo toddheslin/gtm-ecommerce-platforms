@@ -1,0 +1,67 @@
+/*
+** How many events per day of a specified event?
+*/
+SELECT DATE(sent_at) AS Day, COUNT(DISTINCT(user_id)) AS Users
+FROM segment.tracks
+WHERE event = '<event>'
+GROUP BY day
+ORDER BY day
+
+-- how many identifies and tracks for each user and over what time period?
+SELECT
+	a.anonymous_id,
+	a.identify_count,
+	b.event_count,
+	a.first_seen,
+	a.last_seen
+FROM (
+		SELECT
+			anonymous_id,
+			MIN(last_seen) as first_seen,
+			MAX(last_seen) as last_seen,
+			COUNT(1) as identify_count
+		FROM <project>.identifies
+		GROUP BY anonymous_id
+) a
+JOIN (
+		SELECT
+			anonymous_id,
+			COUNT(1) as event_count
+		FROM <project>.tracks
+		GROUP BY anonymous_id
+) b
+	ON a.anonymous_id = b.anonymous_id
+ORDER BY a.identify_count DESC;
+
+/*
+** Advanced session tracking
+** https://blog.modeanalytics.com/finding-user-sessions-sql/
+*/
+
+-- Finding the start of every session
+SELECT *
+  FROM (
+       SELECT *
+              LAG(sent_at,1) OVER (PARTITION BY user_id ORDER BY sent_at) AS last_event
+        FROM "your_source".tracks
+      ) last
+WHERE EXTRACT('EPOCH' FROM sent_at) - EXTRACT('EPOCH' FROM last_event) >= (60 * 10)
+   OR last_event IS NULL
+
+-- Mapping every event to its session
+SELECT *,
+       SUM(is_new_session) OVER (ORDER BY user_id, sent_at ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS global_session_id,
+       SUM(is_new_session) OVER (PARTITION BY user_id ORDER BY sent_at ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS user_session_id
+  FROM (
+       SELECT *,
+              CASE WHEN EXTRACT('EPOCH' FROM sent_at) - EXTRACT('EPOCH' FROM last_event) >= (60 * 10)
+                     OR last_event IS NULL
+                   THEN 1 ELSE 0 END AS is_new_session
+         FROM (
+              SELECT *,
+                     LAG(sent_at,1) OVER (PARTITION BY user_id ORDER BY sent_at) AS last_event
+                FROM "your_source".tracks
+              ) last
+
+
+			 ) final

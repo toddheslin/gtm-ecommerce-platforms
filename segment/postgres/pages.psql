@@ -1,0 +1,7 @@
+/*
+** Number of page views grouped by day
+*/
+SELECT DATE(sent_at) AS Day, COUNT(*) AS Views
+FROM <project>.pages
+GROUP BY day
+ORDER BY day

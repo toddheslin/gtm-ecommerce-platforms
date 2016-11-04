@@ -1,0 +1,52 @@
+/*
+** Get size of each database on server
+*/
+SELECT d.datname AS Name,  pg_catalog.pg_get_userbyid(d.datdba) AS Owner,
+    CASE WHEN pg_catalog.has_database_privilege(d.datname, 'CONNECT')
+        THEN pg_catalog.pg_size_pretty(pg_catalog.pg_database_size(d.datname))
+        ELSE 'No Access'
+    END AS SIZE
+FROM pg_catalog.pg_database d
+    ORDER BY
+    CASE WHEN pg_catalog.has_database_privilege(d.datname, 'CONNECT')
+        THEN pg_catalog.pg_database_size(d.datname)
+        ELSE NULL
+    END DESC -- nulls first
+    LIMIT 20
+
+/*
+** Get the size of individual tables and primary key relations
+*/
+SELECT nspname || '.' || relname AS "relation",
+  pg_size_pretty(pg_relation_size(C.oid)) AS "size"
+FROM pg_class C
+LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+WHERE nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+ORDER BY pg_relation_size(C.oid) DESC
+LIMIT 20;
+
+/*
+** Get table names and columns with data_type
+*/
+SELECT
+	a.table_name,
+	b.column_name,
+	b.data_type
+FROM information_schema.tables a
+JOIN information_schema.columns b
+	ON a.table_name  = b.table_name
+WHERE a.table_schema = '<project>'; /*Update this with the Segment namespace*/
+
+/*
+** Get table names for specific event types
+*/
+SELECT schema as Project, "table" as Event
+FROM disk
+WHERE schema = '<project>'
+  AND "table" != 'aliases'
+  AND "table" != 'groups'
+  AND "table" != 'identifies'
+  AND "table" != 'pages'
+  AND "table" != 'screens'
+  AND "table" != 'tracks'
+ORDER BY "table"

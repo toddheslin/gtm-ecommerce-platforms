@@ -1,0 +1,4 @@
+/*
+** Show current users
+*/
+SELECT * FROM pg_user
