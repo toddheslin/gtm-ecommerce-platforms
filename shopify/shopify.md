@@ -143,41 +143,48 @@ All will be sequential. Here is the tag to add into GTM:
 
 Thanks to the awesome work of [Alec in his article here](http://www.whencanistop.com/2015/11/analytics-on-shopify.html). I've modified his script to make it work for exposing the values into GTM without making a bunch of individual variables. All you need is one called 'checkout'.
 
+I've also added the conditional to check if `window.Shopify.Checkout.step` exists. Why? Because when a customer gets their order notice they will be brought back to this page. Double counting conversions? Yup, but not anymore!.
+
+Fixed.
+
 Copy this into the Shopify `Checkout/Additional Scripts` box.
 
 ```
-// calculate totalDiscount for Completed Order Event
-var discounts = "{{ order.discounts | json }}"
-var totalDiscount = 0;
+<script>
+if(window.Shopify.Checkout.step){
+	// calculate totalDiscount for Completed Order Event
+	var discounts = "{{ order.discounts | json }}"
+	var totalDiscount = 0;
 
-for (var i = 0; i< discounts.length; i++ ) {
-totalDiscount += discounts[i].savings;
+	for (var i = 0; i< discounts.length; i++ ) {
+	totalDiscount += discounts[i].savings;
+	}
+
+	window.dataLayer = window.dataLayer || [];
+	dataLayer.push({
+	    'event' : 'transactionComplete',
+	    'checkout' : function(){
+	      return {
+	        'transactionId': '{{order.order_number}}',
+	        'transactionTotal': {{total_price | times: 0.01}},
+	        'transactionRevenue': {{subtotal_price | times: 0.01}},
+	        'transactionShipping': {{shipping_price | times: 0.01}},
+	        'transactionTax': {{tax_price | times: 0.01}},
+	        'transactionDiscount': totalDiscount,
+	        'transactionProducts': [
+	        {% for line_item in line_items %}
+	          {
+	          'id': '{{line_item.product_id}}',
+	          'sku': '{{line_item.sku}}',
+	          'name': '{{line_item.title}}',
+	          'category': '{{line_item.type}}',
+	          'price': {{line_item.line_price | times: 0.01}},
+	          'quantity': {{line_item.quantity}}
+	          },
+	        {% endfor %}]
+	      }
+	}})
 }
-
-window.dataLayer = window.dataLayer || [];
-dataLayer.push({
-    'event' : 'transactionComplete',
-    'checkout' : function(){
-      return {
-        'transactionId': '{{order.order_number}}',
-        'transactionTotal': {{total_price | times: 0.01}},
-        'transactionRevenue': {{subtotal_price | times: 0.01}},
-        'transactionShipping': {{shipping_price | times: 0.01}},
-        'transactionTax': {{tax_price | times: 0.01}},
-        'transactionDiscount': totalDiscount,
-        'transactionProducts': [
-        {% for line_item in line_items %}
-          {
-          'id': '{{line_item.product_id}}',
-          'sku': '{{line_item.sku}}',
-          'name': '{{line_item.title}}',
-          'category': '{{line_item.type}}',
-          'price': {{line_item.line_price | times: 0.01}},
-          'quantity': {{line_item.quantity}}
-          },
-        {% endfor %}]
-      }
-}})
 </script>
 ```
 
