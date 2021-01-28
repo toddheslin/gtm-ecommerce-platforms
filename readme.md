@@ -1,3 +1,15 @@
+# Note to you lovely people starring this repo
+
+The content in this repo is probably old. Actually, it **is** old, but I'm unsure how relevant it might be to you.
+
+I really appreciate those who have starred the repo, but if you follow me on github instead you'll see other things I'm working on which will be more up to date.
+
+Stay safe!
+
+Todd
+
+---
+
 What's this about?
 ==================
 My central repository for the analytics tools I use, references I rely on and code snippits that save me hours of time. Feel free to use and contribute.
